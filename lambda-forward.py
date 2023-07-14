@@ -45,12 +45,15 @@ def event_encode(event):
     return event
 
 def lambda_handler(event, context):
-    event_list = event_encode(event).get('logEvents')
+    try:
+        event_list = event_encode(event).get('logEvents')
+    except:
+        event_list = [event]
+        print('eventbridge event')
+
     dk_data_list = []
     for event in event_list:
         data =  to_datakit_data(event)
         dk_data_list.append(data)
 
     push_dk(dk_data_list)
-
-    return
