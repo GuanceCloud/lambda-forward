@@ -17,18 +17,18 @@ def push_dk(data):
 
 def to_datakit_data(event):
     data = {
-        'measurement': 'lambda_test',
+        'measurement': 'lambda_logs',
         'time'  : round(time.time()),
         'tags'  : {
             'id':event.get('id'),
-            'timestamp':str(event.get('timestamp'))
+            'timestamp':str(event.get('timestamp', round(time.time())))
         },
         'fields' : {'message':json.dumps(event)},
     }
     try:
         event_message = json.loads(event.get('message'))
     except:
-        return data
+        event_message = event.get('message')
         
     for k, v in event_message.items():
         if isinstance(v, str):
@@ -48,12 +48,14 @@ def lambda_handler(event, context):
     try:
         event_list = event_encode(event).get('logEvents')
     except:
-        event_list = [event]
+        event_list = [{'message':event}]
         print('eventbridge event')
 
     dk_data_list = []
     for event in event_list:
-        data =  to_datakit_data(event)
+        data = to_datakit_data(event)
         dk_data_list.append(data)
 
     push_dk(dk_data_list)
+
+    return
