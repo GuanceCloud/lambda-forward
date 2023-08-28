@@ -20,7 +20,7 @@
 
 7.点击创建函数
 
-8.在[GitHub](https://github.com/GuanceCloud/functiongraph-forward) 中拉取同步代码至下方代码源中，并添加DATAKIT为datakit部署地址，点击`Depoly`
+8.在 GitHub 中拉取同步代码至下方代码源中，并添加DATAKIT为datakit部署地址，点击`Depoly`
 
 ### 配置 Lambda 触发器
 
