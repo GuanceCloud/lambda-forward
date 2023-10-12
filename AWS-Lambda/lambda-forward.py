@@ -5,31 +5,33 @@ import base64
 import gzip
 
 
-DATAKIT = ''
+DATAKIT = 'xxx'
 
 print('Start')
 
 def push_dk(data):
     http = urllib3.PoolManager()
     data = json.dumps(data)
+    print('dk_data:', data)
     response = http.request("POST", f'{DATAKIT}:9529/v1/write/logging', body=data, headers={'Content-Type': 'application/json'})
     print('dk_code:', response.status)
 
-def to_datakit_data(event):
+def to_datakit_data(event,log_group):
     data = {
-        'measurement': 'lambda_logs',
+        'measurement': 'lambda_forwarder',
         'time'  : round(time.time()),
         'tags'  : {
             'id':event.get('id'),
-            'timestamp':str(event.get('timestamp', round(time.time())))
+            'timestamp':str(event.get('timestamp', round(time.time()))),
+            'log_group':log_group
         },
         'fields' : {'message':json.dumps(event)},
     }
     try:
         event_message = json.loads(event.get('message'))
     except:
-        event_message = event.get('message')
-        
+        return data
+
     for k, v in event_message.items():
         if isinstance(v, str):
             data['tags'][k] = v
@@ -45,7 +47,9 @@ def event_encode(event):
     return event
 
 def lambda_handler(event, context):
+    
     try:
+        log_group = event_encode(event).get('logGroup')
         event_list = event_encode(event).get('logEvents')
     except:
         event_list = [{'message':event}]
@@ -53,9 +57,9 @@ def lambda_handler(event, context):
 
     dk_data_list = []
     for event in event_list:
-        data = to_datakit_data(event)
+        data = to_datakit_data(event,log_group)
         dk_data_list.append(data)
-
+    print('dk_data_list',dk_data_list)
     push_dk(dk_data_list)
 
     return
