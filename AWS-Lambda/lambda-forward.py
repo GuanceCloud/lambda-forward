@@ -16,7 +16,7 @@ def push_dk(data):
     response = http.request("POST", f'{DATAKIT}:9529/v1/write/logging', body=data, headers={'Content-Type': 'application/json'})
     print('dk_code:', response.status)
 
-def to_datakit_data(event,log_group):
+def to_datakit_data(event,log_group=''):
     data = {
         'measurement': 'lambda_forwarder',
         'time'  : round(time.time()),
