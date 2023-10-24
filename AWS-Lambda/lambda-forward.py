@@ -19,7 +19,7 @@ def push_dk(data):
 def to_datakit_data(event,log_group):
     data = {
         'measurement': 'lambda_forwarder',
-        'time'  : round(time.time()),
+        'time'  : time.time_ns(),
         'tags'  : {
             'id':event.get('id'),
             'timestamp':str(event.get('timestamp', round(time.time()))),
